@@ -13,21 +13,37 @@ const App = () => {
    
   const [selected, setSelected] = useState(0)
   const [votes, setVotes] = useState([0, 0, 0, 0, 0, 0, 0])
+  const [mostVotes, setMostVotes] = useState(0)
 
   const selectRandom = () => setSelected(Math.floor(Math.random() * anecdotes.length))
 
   const addVote = () => {
-    const copy = [...votes]
-    copy[selected]++
-    console.log(copy)
-    setVotes(copy)
+    const votesCopy = [...votes]
+    votesCopy[selected]++
+    console.log('votes: ', votesCopy)
+
+    const max = Math.max(...votesCopy)
+    const anecdote = votesCopy.indexOf(max)
+    console.log('most votes: anecdote ', anecdote, '(', votesCopy[anecdote], ' votes )')
+
+    setVotes(votesCopy)
+    setMostVotes(anecdote)
   }
 
   return (
     <div>
-      <button onClick={selectRandom}>select</button>
+      <h1>Anecdote of the day</h1>
+      {anecdotes[selected]}
+      <br />
+      has {votes[selected]} votes
+      <br />
       <button onClick={addVote}>vote</button>
-      <p>{anecdotes[selected]}</p>
+      <button onClick={selectRandom}>next anecdote</button>
+
+      <h1>Anecdote with most votes</h1>
+      {anecdotes[mostVotes]}
+      <br />
+      has {votes[mostVotes]} votes
     </div>
   )
 }
