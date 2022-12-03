@@ -1,8 +1,17 @@
 import { useState } from 'react'
 
-const Statistics = ({ good, neutral, bad}) => {
+const Statistics = ({ good, neutral, bad }) => {
   const numResponses = good + neutral + bad
   const sum = good - bad
+
+  if (numResponses === 0) {
+    return (
+      <div>
+        <h1>statistics</h1>
+        <p>No feedback given</p>
+      </div>
+    )
+  }
 
   return (
     <div>
