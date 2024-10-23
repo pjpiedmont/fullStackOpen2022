@@ -4,6 +4,8 @@ import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
 
+const baseUrl = 'http://localhost:3001/persons'
+
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
@@ -20,19 +22,25 @@ const App = () => {
   const addName = (event) => {
     event.preventDefault()
 
-    if (persons.find((person) => person.name === newName)) {
+    if (persons.find((person) => person.name === newName))
+    {
       alert(`${newName} is already added to phonebook`)
-    } else {
-      const newNameObject = {
-        name: newName,
-        number: newNumber,
-        id: persons.length + 1,
-      }
-      setPersons(persons.concat(newNameObject))
+      return
+    }
+    
+    const newPersonObject = {
+      name: newName,
+      number: newNumber,
     }
 
-    setNewName('')
-    setNewNumber('')
+    axios
+      .post(baseUrl, newPersonObject)
+      .then(response => {
+        const returnedPerson = response.data
+        setPersons(persons.concat(returnedPerson))
+        setNewName('')
+        setNewNumber('')
+      })
   }
 
   const handleFormChange = (event) => {
