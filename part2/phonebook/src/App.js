@@ -116,7 +116,7 @@ const App = () => {
         }, 5000)
       })
       .catch(err => {
-        setErrorMessage(`${newName} could not be removed from the phonebook. Error message: ${err}`)
+        setErrorMessage(`${name} could not be removed from the phonebook. Error message: ${err}`)
         setTimeout(() => {
           setErrorMessage(null)
         }, 5000)
