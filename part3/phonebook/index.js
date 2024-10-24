@@ -46,6 +46,28 @@ app.get('/api/persons/:id', (req, res) => {
 	}
 })
 
+app.post('/api/persons', (req, res) => {
+	console.log(req.body)
+	const id = Math.floor(Math.random() * 1000)
+
+	new_person = {
+		id: id,
+		...req.body
+	}
+
+	console.log(new_person)
+
+	if (req.body.name && req.body.number)
+	{
+		persons.push(new_person)
+		res.status(201).end()
+	}
+	else
+	{
+		res.status(400).end()
+	}
+})
+
 app.delete('/api/persons/:id', (req, res) => {
 	const id = Number(req.params.id)
 	persons = persons.filter(p => p.id !== id)
