@@ -1,7 +1,6 @@
-const Country = ({ countries, show }) => {
-  if (show) {
-    const country = countries[0]
-
+const Country = ({ country }) => {
+  if (country)
+  {
     return (
       <div>
         <h1>{country.name.official}</h1>
