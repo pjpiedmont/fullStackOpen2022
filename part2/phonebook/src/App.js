@@ -3,9 +3,6 @@ import personService from './services/person'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
 import Persons from './components/Persons'
-import person from './services/person'
-
-const baseUrl = 'http://localhost:3001/persons'
 
 const App = () => {
   const [persons, setPersons] = useState([])
