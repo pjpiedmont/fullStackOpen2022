@@ -1,4 +1,5 @@
 const express = require('express')
+const morgan = require('morgan')
 const app = express()
 
 let persons = [
@@ -25,6 +26,7 @@ let persons = [
 ]
 
 app.use(express.json())
+app.use(morgan('tiny'))
 
 app.get('/api/persons', (req, res) => {
 	res.json(persons)
@@ -34,7 +36,7 @@ app.get('/api/persons/:id', (req, res) => {
 	const id = Number(req.params.id)
 	const person = persons.find(p => p.id === id)
 
-	console.log(id, person)
+	// console.log(id, person)
 
 	if (person)
 	{
@@ -47,11 +49,11 @@ app.get('/api/persons/:id', (req, res) => {
 })
 
 app.post('/api/persons', (req, res) => {
-	console.log(req.body)
+	// console.log(req.body)
 
 	if (!req.body.name || !req.body.number)
 	{
-		console.log('bad request, missing name or number')
+		// console.log('bad request, missing name or number')
 		res.status(400).json({error: 'bad request, missing name or number'})
 		return
 	}
@@ -60,7 +62,7 @@ app.post('/api/persons', (req, res) => {
 
 	if (person)
 	{
-		console.log('person already exists')
+		// console.log('person already exists')
 		res.status(409).json({error: 'person already exists'})
 		return
 	}
@@ -72,7 +74,7 @@ app.post('/api/persons', (req, res) => {
 		...req.body
 	}
 
-	console.log(new_person)
+	// console.log(new_person)
 
 	persons.push(new_person)
 	res.status(201).end()
@@ -85,7 +87,7 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 app.get('/info', (req, res) => {
-	console.log(req)
+	// console.log(req)
 	res_text = `
 		<p>Phonebook has info for ${persons.length} people</p>
 		<p>${new Date()}</p>
