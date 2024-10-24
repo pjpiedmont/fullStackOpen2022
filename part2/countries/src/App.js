@@ -7,10 +7,11 @@ import ResultList from './components/ResultList'
 import Country from './components/Country'
 
 const App = () => {
-  const [countries, setCountries] = useState([]);
-  const [filter, setFilter] = useState('');
+  const [countries, setCountries] = useState([])
+  const [filter, setFilter] = useState('')
+  const [displayCountry, setDisplayCountry] = useState(null)
 
-  const countriesToShow = filter === ''
+  const filteredCountries = filter === ''
     ? countries
     : countries.filter(country =>
       country.name.official.toLowerCase().includes(filter.toLowerCase())
@@ -18,11 +19,27 @@ const App = () => {
 
   const handleFilterChange = (event) => setFilter(event.target.value)
 
+  const handleCountryChange = (country) => {
+    setDisplayCountry(country)
+  }
+
   useEffect(() => {
     axios
       .get('https://restcountries.com/v3.1/all')
       .then(response => setCountries(response.data))
   }, [])
+
+  useEffect(() => {
+    if (filteredCountries.length === 1)
+    {
+      setDisplayCountry(filteredCountries[0])
+    }
+
+    if (filteredCountries.length > 10)
+    {
+      setDisplayCountry(null)
+    }
+  }, [filteredCountries])
 
   return (
     <div>
@@ -30,14 +47,13 @@ const App = () => {
         text={filter}
         handleChange={handleFilterChange}
       />
-      <Error show={countriesToShow.length > 10} />
+      <Error show={filteredCountries.length > 10} />
       <ResultList
-        names={countriesToShow.map(country => country.name.official)}
-        show={countriesToShow.length > 1 && countriesToShow.length < 10}
+        countries={filteredCountries}
+        handleShow={handleCountryChange}
       />
       <Country
-        countries={countriesToShow}
-        show={countriesToShow.length === 1}
+        country={displayCountry}
       />
     </div>
   )

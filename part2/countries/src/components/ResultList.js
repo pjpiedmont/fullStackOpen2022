@@ -1,8 +1,10 @@
-const ResultList = ({ names, show }) => {
-  if (show) {
+const ResultList = ({ countries, handleShow }) => {
+  if (countries.length > 1 && countries.length < 10)
+  {
+    console.log(countries)
     return (
       <div>
-        {names.map((name, i) => <div key={i}>{name}</div>)}
+        {countries.map((c, i) => <div key={i}>{c.name.official} <button onClick={() => handleShow(c)}>show</button></div>)}
       </div>
     )
   }
