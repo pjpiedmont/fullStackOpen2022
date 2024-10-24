@@ -17,7 +17,7 @@ const App = () => {
         person.name.toLowerCase().includes(filter.toLowerCase())
       )
 
-  const addName = (event) => {
+  const addPerson = (event) => {
     event.preventDefault()
 
     if (persons.find((person) => person.name === newName))
@@ -37,6 +37,27 @@ const App = () => {
         setPersons(persons.concat(returnedPerson))
         setNewName('')
         setNewNumber('')
+      })
+  }
+
+  const removePerson = ({ id, name }) => {
+    if (!window.confirm(`Delete ${name}?`))
+    {
+      return
+    }
+
+    if (!persons.find(person => person.id === id))
+    {
+      alert(`Error, ${name} is not in the list`)
+      return
+    }
+
+    personService
+      .remove(id)
+      .then(res => {
+        console.log(res)
+        let newPersons = persons.filter(person => person.id !== id)
+        setPersons(newPersons)
       })
   }
 
@@ -72,11 +93,14 @@ const App = () => {
         name={newName}
         number={newNumber}
         handleChange={handleFormChange}
-        handleSubmit={addName}
+        handleSubmit={addPerson}
       />
 
       <h2>Numbers</h2>
-      <Persons persons={personsToShow} />
+      <Persons
+        persons={personsToShow}
+        deleteHandler={removePerson}
+      />
     </div>
   )
 }
