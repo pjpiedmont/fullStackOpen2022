@@ -52,7 +52,7 @@ app.post('/api/persons', (req, res) => {
 	if (!req.body.name || !req.body.number)
 	{
 		console.log('bad request, missing name or number')
-		res.status(400).end()
+		res.status(400).json({error: 'bad request, missing name or number'})
 		return
 	}
 
@@ -61,7 +61,7 @@ app.post('/api/persons', (req, res) => {
 	if (person)
 	{
 		console.log('person already exists')
-		res.status(204).end()
+		res.status(409).json({error: 'person already exists'})
 		return
 	}
 
