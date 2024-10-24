@@ -2,13 +2,18 @@ import { useState, useEffect } from 'react'
 import personService from './services/person'
 import Filter from './components/Filter'
 import PersonForm from './components/PersonForm'
-import Persons from './components/Persons'
+import PersonList from './components/PersonList'
+import Notification from './components/Notification'
+
+import './index.css'
 
 const App = () => {
   const [persons, setPersons] = useState([])
   const [newName, setNewName] = useState('')
   const [newNumber, setNewNumber] = useState('')
   const [filter, setFilter] = useState('')
+  const [successMessage, setSuccessMessage] = useState(null)
+  const [errorMessage, setErrorMessage] = useState(null)
 
   const personsToShow =
     filter === ''
@@ -37,8 +42,20 @@ const App = () => {
       .add(newPersonObject)
       .then(returnedPerson => {
         setPersons(persons.concat(returnedPerson))
+
         setNewName('')
         setNewNumber('')
+
+        setSuccessMessage(`${newName} was successfully added to the phonebook.`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
+      })
+      .catch(err => {
+        setErrorMessage(`${newName} could not be added to the phonebook. Error message: ${err}`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       })
   }
 
@@ -54,12 +71,24 @@ const App = () => {
         console.log(`person ${updatedPerson.name}'s phone number updated to ${updatedPerson.number}`)
         let newPersons = persons.map(person => person.id === updatedPerson.id ? updatedPerson : person)
         setPersons(newPersons)
+
         setNewName('')
         setNewNumber('')
+
+        setSuccessMessage(`${updatedPerson.name}'s phone number was successfully updated.`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
+      })
+      .catch(err => {
+        setErrorMessage(`${newName}'s phone number could not be updated. Error message: ${err}`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       })
   }
 
-  const removePerson = ({ id, name }) => {
+  const removePerson = (id, name) => {
     if (!window.confirm(`Delete ${name}?`))
     {
       return
@@ -67,7 +96,10 @@ const App = () => {
 
     if (!persons.find(person => person.id === id))
     {
-      alert(`Error, ${name} is not in the list`)
+      setErrorMessage(`${name} is not in the phonebook.`)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 5000)
       return
     }
 
@@ -77,6 +109,17 @@ const App = () => {
         console.log(res)
         let newPersons = persons.filter(person => person.id !== id)
         setPersons(newPersons)
+
+        setSuccessMessage(`${name} was successfully removed from the phonebook.`)
+        setTimeout(() => {
+          setSuccessMessage(null)
+        }, 5000)
+      })
+      .catch(err => {
+        setErrorMessage(`${newName} could not be removed from the phonebook. Error message: ${err}`)
+        setTimeout(() => {
+          setErrorMessage(null)
+        }, 5000)
       })
   }
 
@@ -105,7 +148,18 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
-      <Filter text={filter} handleChange={handleFilterChange} />
+      <Notification
+        message={successMessage}
+        type="success"
+      />
+      <Notification
+        message={errorMessage}
+        type="error"
+      />
+      <Filter
+        text={filter}
+        handleChange={handleFilterChange}
+      />
 
       <h2>Add a New</h2>
       <PersonForm
@@ -116,7 +170,7 @@ const App = () => {
       />
 
       <h2>Numbers</h2>
-      <Persons
+      <PersonList
         persons={personsToShow}
         deleteHandler={removePerson}
       />
