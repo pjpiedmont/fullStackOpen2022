@@ -48,6 +48,23 @@ app.get('/api/persons/:id', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
 	console.log(req.body)
+
+	if (!req.body.name || !req.body.number)
+	{
+		console.log('bad request, missing name or number')
+		res.status(400).end()
+		return
+	}
+
+	let person = persons.find(p => p.name === req.body.name)
+
+	if (person)
+	{
+		console.log('person already exists')
+		res.status(204).end()
+		return
+	}
+
 	const id = Math.floor(Math.random() * 1000)
 
 	new_person = {
@@ -57,15 +74,8 @@ app.post('/api/persons', (req, res) => {
 
 	console.log(new_person)
 
-	if (req.body.name && req.body.number)
-	{
-		persons.push(new_person)
-		res.status(201).end()
-	}
-	else
-	{
-		res.status(400).end()
-	}
+	persons.push(new_person)
+	res.status(201).end()
 })
 
 app.delete('/api/persons/:id', (req, res) => {
