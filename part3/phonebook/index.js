@@ -25,8 +25,30 @@ let persons = [
 	}
 ]
 
+morgan.token('body', (req, res) => {
+	if (Object.keys(req.body).length > 0)
+	{
+		return JSON.stringify(req.body)
+	}
+	else
+	{
+		return ''
+	}
+})
+
+const loggerFormat = (tokens, req, res) => {
+	return [
+		tokens.method(req, res),
+		tokens.url(req, res),
+		tokens.status(req, res),
+		tokens.res(req, res, 'content-length'), '-',
+		tokens['response-time'](req,res), 'ms',
+		tokens.body(req, res),
+	].join(' ')
+}
+
 app.use(express.json())
-app.use(morgan('tiny'))
+app.use(morgan(loggerFormat))
 
 app.get('/api/persons', (req, res) => {
 	res.json(persons)
