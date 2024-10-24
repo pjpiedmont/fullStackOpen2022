@@ -1,4 +1,6 @@
-const Country = ({ country }) => {
+import Weather from "./Weather"
+
+const Country = ({ country, weather }) => {
   if (country)
   {
     return (
@@ -13,6 +15,11 @@ const Country = ({ country }) => {
         </ul>
 
         <img src={country.flags.png} alt={`Flag of ${country.name.official}`}></img>
+
+        <Weather
+          city={country.capital[0]}
+          weather={weather}
+        />
       </div>
     )
   }
