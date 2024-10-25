@@ -1,13 +1,3 @@
-// const App = () => {
-//     return (
-//         <div>
-//             <p>Hello world</p>
-//         </div>
-//     )
-// }
-
-// export default App
-
 import { useState, useEffect } from 'react'
 import personService from './services/person'
 import Filter from './components/Filter'
@@ -47,9 +37,13 @@ const App = () => {
             number: newNumber,
         }
 
+        console.log(newPersonObject)
+
         personService
             .add(newPersonObject)
             .then(returnedPerson => {
+                console.log(returnedPerson)
+                
                 setPersons(persons.concat(returnedPerson))
 
                 setNewName('')

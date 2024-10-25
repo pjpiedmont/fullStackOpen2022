@@ -1,5 +1,7 @@
 const express = require('express')
+const cors = require('cors')
 const morgan = require('morgan')
+
 const app = express()
 
 let persons = [
@@ -47,6 +49,7 @@ const loggerFormat = (tokens, req, res) => {
 	].join(' ')
 }
 
+app.use(cors())
 app.use(express.json())
 app.use(morgan(loggerFormat))
 
@@ -96,10 +99,10 @@ app.post('/api/persons', (req, res) => {
 		...req.body
 	}
 
-	// console.log(new_person)
+	console.log('added person:', new_person)
 
 	persons.push(new_person)
-	res.status(201).end()
+	res.status(201).json(new_person)
 })
 
 app.delete('/api/persons/:id', (req, res) => {
