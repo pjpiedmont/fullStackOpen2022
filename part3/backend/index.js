@@ -73,31 +73,23 @@ app.get('/api/persons/:id', (req, res) => {
 })
 
 app.post('/api/persons', (req, res) => {
-	if (!req.body.name || !req.body.number)
+	const body = req.body
+
+	if (!body.name || !body.number)
 	{
-		res.status(400).json({error: 'bad request, missing name or number'})
-		return
+		return res.status(400).json({error: 'bad request, missing name or number'})
 	}
 
-	let person = persons.find(p => p.name === req.body.name)
+	const newPerson = new Person({
+		name: body.name,
+		number: body.number
+	})
 
-	if (person)
-	{
-		res.status(409).json({error: 'person already exists'})
-		return
-	}
+	newPerson.save().then(savedPerson => {
+		res.status(201).json(savedPerson)
+	})
 
-	const id = Math.floor(Math.random() * 1000)
-
-	new_person = {
-		id: id,
-		...req.body
-	}
-
-	console.log('added person:', new_person)
-
-	persons.push(new_person)
-	res.status(201).json(new_person)
+	// TODO: Handle duplicate person
 })
 
 app.delete('/api/persons/:id', (req, res) => {
