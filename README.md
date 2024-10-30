@@ -1,4 +1,4 @@
-# fullStackOpen2022
-Solutions to the University of Helsinki's 2022 Full Stack open course exercises.
+# fullStackOpen
+My solutions to the University of Helsinki's Full Stack Open course exercises.
 
 [Full Stack Open](https://fullstackopen.com/en/)
