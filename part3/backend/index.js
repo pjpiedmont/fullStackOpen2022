@@ -1,6 +1,10 @@
+require('dotenv').config()
+
 const express = require('express')
 const cors = require('cors')
 const morgan = require('morgan')
+
+const Person = require('./models/person')
 
 const app = express()
 
@@ -55,21 +59,17 @@ app.use(express.static('dist'))
 app.use(morgan(loggerFormat))
 
 app.get('/api/persons', (req, res) => {
-	res.json(persons)
+	Person.find({}).then(persons => {
+		res.json(persons)
+	})
 })
 
 app.get('/api/persons/:id', (req, res) => {
-	const id = Number(req.params.id)
-	const person = persons.find(p => p.id === id)
-
-	if (person)
-	{
+	Person.findById(req.params.id).then(person => {
 		res.json(person)
-	}
-	else
-	{
-		res.status(404).end()
-	}
+	})
+
+	// TODO: Implement error handling
 })
 
 app.post('/api/persons', (req, res) => {
@@ -107,14 +107,16 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 app.get('/info', (req, res) => {
-	res_text = `
-		<p>Phonebook has info for ${persons.length} people</p>
-		<p>${new Date()}</p>
-	`
-	res.send(res_text)
+	Person.find({}).then(persons => {
+		res_text = `
+			<p>Phonebook has info for ${persons.length} people</p>
+			<p>${new Date()}</p>
+		`
+		res.send(res_text)
+	})
 })
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT
 app.listen(PORT, () => {
 	console.log(`Server running on port ${PORT}`)
 })
