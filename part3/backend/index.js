@@ -51,6 +51,7 @@ const loggerFormat = (tokens, req, res) => {
 
 app.use(cors())
 app.use(express.json())
+app.use(express.static('dist'))
 app.use(morgan(loggerFormat))
 
 app.get('/api/persons', (req, res) => {
@@ -60,8 +61,6 @@ app.get('/api/persons', (req, res) => {
 app.get('/api/persons/:id', (req, res) => {
 	const id = Number(req.params.id)
 	const person = persons.find(p => p.id === id)
-
-	// console.log(id, person)
 
 	if (person)
 	{
@@ -74,11 +73,8 @@ app.get('/api/persons/:id', (req, res) => {
 })
 
 app.post('/api/persons', (req, res) => {
-	// console.log(req.body)
-
 	if (!req.body.name || !req.body.number)
 	{
-		// console.log('bad request, missing name or number')
 		res.status(400).json({error: 'bad request, missing name or number'})
 		return
 	}
@@ -87,7 +83,6 @@ app.post('/api/persons', (req, res) => {
 
 	if (person)
 	{
-		// console.log('person already exists')
 		res.status(409).json({error: 'person already exists'})
 		return
 	}
@@ -112,7 +107,6 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 app.get('/info', (req, res) => {
-	// console.log(req)
 	res_text = `
 		<p>Phonebook has info for ${persons.length} people</p>
 		<p>${new Date()}</p>
