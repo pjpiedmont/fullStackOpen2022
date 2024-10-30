@@ -87,6 +87,21 @@ app.post('/api/persons', (req, res, next) => {
 	// TODO: Handle duplicate person
 })
 
+app.put('/api/persons/:id', (req, res, next) => {
+	const body = req.body
+
+	const newPerson = {
+		name: body.name,
+		number: body.number
+	}
+
+	Person.findByIdAndUpdate(req.params.id, newPerson, {new: true})
+		.then(updatedPerson => {
+			res.json(updatedPerson)
+		})
+		.catch(err => next(err))
+})
+
 app.delete('/api/persons/:id', (req, res, next) => {
 	Person.findByIdAndDelete(req.params.id)
 		.then(result => {
