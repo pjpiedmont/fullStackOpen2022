@@ -55,7 +55,7 @@ const App = () => {
                 }, 5000)
             })
             .catch(err => {
-                setErrorMessage(`${newName} could not be added to the phonebook. Error message: ${err}`)
+                setErrorMessage(err.response.data.error)
                 setTimeout(() => {
                     setErrorMessage(null)
                 }, 5000)
@@ -84,7 +84,7 @@ const App = () => {
                 }, 5000)
             })
             .catch(err => {
-                setErrorMessage(`${newName}'s phone number could not be updated. Error message: ${err}`)
+                setErrorMessage(err.response.data.error)
                 setTimeout(() => {
                     setErrorMessage(null)
                 }, 5000)
@@ -117,7 +117,7 @@ const App = () => {
                 }, 5000)
             })
             .catch(err => {
-                setErrorMessage(`${name} could not be removed from the phonebook. Error message: ${err}`)
+                setErrorMessage(err.response.data.error)
                 setTimeout(() => {
                     setErrorMessage(null)
                 }, 5000)

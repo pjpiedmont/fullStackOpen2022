@@ -37,8 +37,16 @@ const errorHandler = (err, req, res, next) => {
 	{
 		return res.status(400).send({error: 'malformed ID'})
 	}
+	else if (err.name === 'ValidationError')
+	{
+		return res.status(400).json({error: err.message})
+	}
 
 	next(error)
+}
+
+const unknownEndpoint = (req, res) => {
+	res.status(404).send({error: 'endpoint does not exist'})
 }
 
 app.use(cors())
@@ -70,32 +78,26 @@ app.get('/api/persons/:id', (req, res, next) => {
 app.post('/api/persons', (req, res, next) => {
 	const body = req.body
 
-	if (!body.name || !body.number)
-	{
-		return res.status(400).json({error: 'bad request, missing name or number'})
-	}
-
 	const newPerson = new Person({
 		name: body.name,
 		number: body.number
 	})
 
-	newPerson.save().then(savedPerson => {
-		res.status(201).json(savedPerson)
-	})
-
-	// TODO: Handle duplicate person
+	newPerson.save()
+		.then(savedPerson => {
+			res.status(201).json(savedPerson)
+		})
+		.catch(err => next(err))
 })
 
 app.put('/api/persons/:id', (req, res, next) => {
-	const body = req.body
+	const { name, number } = req.body
 
-	const newPerson = {
-		name: body.name,
-		number: body.number
-	}
-
-	Person.findByIdAndUpdate(req.params.id, newPerson, {new: true})
+	Person.findByIdAndUpdate(
+		req.params.id,
+		{ name, number },
+		{ new: true, runValidators: true, context: 'query' }
+	)
 		.then(updatedPerson => {
 			res.json(updatedPerson)
 		})
@@ -120,6 +122,7 @@ app.get('/info', (req, res, next) => {
 	})
 })
 
+app.use(unknownEndpoint)
 app.use(errorHandler)
 
 const PORT = process.env.PORT
