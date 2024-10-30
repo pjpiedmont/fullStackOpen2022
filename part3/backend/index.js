@@ -54,8 +54,8 @@ const loggerFormat = (tokens, req, res) => {
 }
 
 app.use(cors())
-app.use(express.json())
 app.use(express.static('dist'))
+app.use(express.json())
 app.use(morgan(loggerFormat))
 
 app.get('/api/persons', (req, res) => {
@@ -65,11 +65,21 @@ app.get('/api/persons', (req, res) => {
 })
 
 app.get('/api/persons/:id', (req, res) => {
-	Person.findById(req.params.id).then(person => {
-		res.json(person)
-	})
-
-	// TODO: Implement error handling
+	Person.findById(req.params.id)
+		.then(person => {
+			if (person)
+			{
+				res.json(person)
+			}
+			else
+			{
+				res.status(404).end()
+			}
+		})
+		.catch(err => {
+			console.log(err)
+			res.status(400).send({error: 'malformed ID'})
+		})
 })
 
 app.post('/api/persons', (req, res) => {
@@ -93,9 +103,13 @@ app.post('/api/persons', (req, res) => {
 })
 
 app.delete('/api/persons/:id', (req, res) => {
-	const id = Number(req.params.id)
-	persons = persons.filter(p => p.id !== id)
-	res.status(204).end()
+	Person.findByIdAndDelete(req.params.id)
+		.then(result => {
+			res.status(204).end()
+		})
+		.catch(err => {
+			res.status(400).send({error: 'malformed ID'})
+		})
 })
 
 app.get('/info', (req, res) => {
