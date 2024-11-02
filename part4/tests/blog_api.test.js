@@ -35,7 +35,7 @@ describe('when blog posts already exist', () => {
   })
 
   describe('add a new blog', () => {
-    test('succeeds with valid data', async () => {
+    test('succeeds with status code 201 if data is valid', async () => {
       const newBlog = {
         title: 'Music is Awesome',
         author: 'Parker Piedmont',
@@ -61,7 +61,7 @@ describe('when blog posts already exist', () => {
       assert(urls.includes(newBlog.url))
     })
 
-    test('succeeds when missing likes and sets likes to zero', async () => {
+    test('succeeds with status code 201 if missing likes and sets likes to zero', async () => {
       const newBlog = {
         title: 'Music is Awesome',
         author: 'Parker Piedmont',
@@ -105,6 +105,31 @@ describe('when blog posts already exist', () => {
         .post('/api/blogs')
         .send(newBlog)
         .expect(400)
+    })
+  })
+
+  describe('update an existing blog', () => {
+    test('succeeds with status code 200 if ID is valid', async () => {
+      const blogs = await helper.blogsInDb()
+      const blogToUpdate = blogs[0]
+
+      const newBlog = {
+        title: 'Music is Awesome',
+        author: 'Parker Piedmont',
+        url: 'https://parkerpiedmont.com',
+        likes: 8,
+      }
+
+      await api
+        .put(`/api/blogs/${blogToUpdate.id}`)
+        .send(newBlog)
+        .expect(200)
+        .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const updatedBlog = blogsAtEnd.find(blog => blog.id === blogToUpdate.id)
+      delete updatedBlog.id
+      assert.deepStrictEqual(updatedBlog, newBlog)
     })
   })
 
