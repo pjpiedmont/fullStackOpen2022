@@ -30,6 +30,13 @@ describe('API: retrieve blogs', () => {
   })
 })
 
+describe('API: blog data format', () => {
+  test('blog ID field is named \'id\'', async () => {
+    const response = await helper.blogsInDb()
+    response.forEach(blog => assert(('id' in blog) && !('_id' in blog)))
+  })
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
