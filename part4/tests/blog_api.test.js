@@ -37,6 +37,34 @@ describe('API: blog data format', () => {
   })
 })
 
+describe('API: add blogs', () => {
+  test('a valid blog can be added', async () => {
+    const newBlog = {
+      title: 'Music is Awesome',
+      author: 'Parker Piedmont',
+      url: 'https://parkerpiedmont.com',
+      likes: 8,
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+
+    const titles = blogsAtEnd.map(blog => blog.title)
+    const authors = blogsAtEnd.map(blog => blog.author)
+    const urls = blogsAtEnd.map(blog => blog.url)
+
+    assert(titles.includes(newBlog.title))
+    assert(authors.includes(newBlog.author))
+    assert(urls.includes(newBlog.url))
+  })
+})
+
 after(async () => {
   await mongoose.connection.close()
 })
