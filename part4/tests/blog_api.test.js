@@ -38,48 +38,78 @@ describe('API: blog data format', () => {
 })
 
 describe('API: add blogs', () => {
-  test('a valid blog can be added', async () => {
-    const newBlog = {
-      title: 'Music is Awesome',
-      author: 'Parker Piedmont',
-      url: 'https://parkerpiedmont.com',
-      likes: 8,
-    }
+  describe('valid blogs', () => {
+    test('a valid blog can be added', async () => {
+      const newBlog = {
+        title: 'Music is Awesome',
+        author: 'Parker Piedmont',
+        url: 'https://parkerpiedmont.com',
+        likes: 8,
+      }
 
-    await api
-      .post('/api/blogs')
-      .send(newBlog)
-      .expect(201)
-      .expect('Content-Type', /application\/json/)
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
 
-    const blogsAtEnd = await helper.blogsInDb()
-    assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
 
-    const titles = blogsAtEnd.map(blog => blog.title)
-    const authors = blogsAtEnd.map(blog => blog.author)
-    const urls = blogsAtEnd.map(blog => blog.url)
+      const titles = blogsAtEnd.map(blog => blog.title)
+      const authors = blogsAtEnd.map(blog => blog.author)
+      const urls = blogsAtEnd.map(blog => blog.url)
 
-    assert(titles.includes(newBlog.title))
-    assert(authors.includes(newBlog.author))
-    assert(urls.includes(newBlog.url))
+      assert(titles.includes(newBlog.title))
+      assert(authors.includes(newBlog.author))
+      assert(urls.includes(newBlog.url))
+    })
+
+    test('blog without likes sets likes to zero', async () => {
+      const newBlog = {
+        title: 'Music is Awesome',
+        author: 'Parker Piedmont',
+        url: 'https://parkerpiedmont.com',
+      }
+
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(201)
+        .expect('Content-Type', /application\/json/)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      const addedBlog = blogsAtEnd.find(blog => blog.title === newBlog.title)
+      assert.strictEqual(addedBlog.likes, 0)
+    })
   })
 
-  test('blog without likes sets likes to zero', async () => {
-    const newBlog = {
-      title: 'Music is Awesome',
-      author: 'Parker Piedmont',
-      url: 'https://parkerpiedmont.com',
-    }
+  describe('invalid blogs', () => {
+    test('blog without title is not added', async () => {
+      const newBlog = {
+        author: 'Parker Piedmont',
+        url: 'https://parkerpiedmont.com',
+        likes: 8,
+      }
 
-    await api
-      .post('/api/blogs')
-      .send(newBlog)
-      .expect(201)
-      .expect('Content-Type', /application\/json/)
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+    })
 
-    const blogsAtEnd = await helper.blogsInDb()
-    const addedBlog = blogsAtEnd.find(blog => blog.title === newBlog.title)
-    assert.strictEqual(addedBlog.likes, 0)
+    test('blog without url is not added', async () => {
+      const newBlog = {
+        title: 'Music is Awesome',
+        author: 'Parker Piedmont',
+        likes: 8,
+      }
+  
+      await api
+        .post('/api/blogs')
+        .send(newBlog)
+        .expect(400)
+    })
   })
 })
 
