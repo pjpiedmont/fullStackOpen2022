@@ -63,6 +63,24 @@ describe('API: add blogs', () => {
     assert(authors.includes(newBlog.author))
     assert(urls.includes(newBlog.url))
   })
+
+  test('blog without likes sets likes to zero', async () => {
+    const newBlog = {
+      title: 'Music is Awesome',
+      author: 'Parker Piedmont',
+      url: 'https://parkerpiedmont.com',
+    }
+
+    await api
+      .post('/api/blogs')
+      .send(newBlog)
+      .expect(201)
+      .expect('Content-Type', /application\/json/)
+
+    const blogsAtEnd = await helper.blogsInDb()
+    const addedBlog = blogsAtEnd.find(blog => blog.title === newBlog.title)
+    assert.strictEqual(addedBlog.likes, 0)
+  })
 })
 
 after(async () => {
