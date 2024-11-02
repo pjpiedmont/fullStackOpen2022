@@ -8,15 +8,15 @@ const app = require('../app')
 
 const api = supertest(app)
 
-beforeEach(async () => {
-  await Blog.deleteMany({})
+describe('when blog posts already exist', () => {
+  beforeEach(async () => {
+    await Blog.deleteMany({})
+  
+    const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
+    const promiseArray = blogObjects.map(blog => blog.save())
+    await Promise.all(promiseArray)
+  })
 
-  const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
-  const promiseArray = blogObjects.map(blog => blog.save())
-  await Promise.all(promiseArray)
-})
-
-describe('API: retrieve blogs', () => {
   test('blogs are returned as json', async () => {
     await api
       .get('/api/blogs')
@@ -28,18 +28,14 @@ describe('API: retrieve blogs', () => {
     const response = await helper.blogsInDb()
     assert.strictEqual(response.length, helper.initialBlogs.length)
   })
-})
 
-describe('API: blog data format', () => {
   test('blog ID field is named \'id\'', async () => {
     const response = await helper.blogsInDb()
     response.forEach(blog => assert(('id' in blog) && !('_id' in blog)))
   })
-})
 
-describe('API: add blogs', () => {
-  describe('valid blogs', () => {
-    test('a valid blog can be added', async () => {
+  describe('add a new blog', () => {
+    test('succeeds with valid data', async () => {
       const newBlog = {
         title: 'Music is Awesome',
         author: 'Parker Piedmont',
@@ -65,7 +61,7 @@ describe('API: add blogs', () => {
       assert(urls.includes(newBlog.url))
     })
 
-    test('blog without likes sets likes to zero', async () => {
+    test('succeeds when missing likes and sets likes to zero', async () => {
       const newBlog = {
         title: 'Music is Awesome',
         author: 'Parker Piedmont',
@@ -79,13 +75,13 @@ describe('API: add blogs', () => {
         .expect('Content-Type', /application\/json/)
 
       const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length + 1)
+
       const addedBlog = blogsAtEnd.find(blog => blog.title === newBlog.title)
       assert.strictEqual(addedBlog.likes, 0)
     })
-  })
 
-  describe('invalid blogs', () => {
-    test('blog without title is not added', async () => {
+    test('fails with status code 400 if title does not exist', async () => {
       const newBlog = {
         author: 'Parker Piedmont',
         url: 'https://parkerpiedmont.com',
@@ -98,17 +94,31 @@ describe('API: add blogs', () => {
         .expect(400)
     })
 
-    test('blog without url is not added', async () => {
+    test('fails with status code 400 if URL does not exist', async () => {
       const newBlog = {
         title: 'Music is Awesome',
         author: 'Parker Piedmont',
         likes: 8,
       }
-  
+
       await api
         .post('/api/blogs')
         .send(newBlog)
         .expect(400)
+    })
+  })
+
+  describe('delete an existing blog', () => {
+    test('succeeds with status code 204 if ID is valid', async () => {
+      const blogs = await helper.blogsInDb()
+      const blogToDelete = blogs[0]
+
+      await api
+        .delete(`/api/blogs/${blogToDelete.id}`)
+        .expect(204)
+
+      const blogsAtEnd = await helper.blogsInDb()
+      assert.strictEqual(blogsAtEnd.length, helper.initialBlogs.length - 1)
     })
   })
 })
