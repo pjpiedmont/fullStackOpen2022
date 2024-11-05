@@ -11,7 +11,7 @@ const api = supertest(app)
 describe('when blog posts already exist', () => {
   beforeEach(async () => {
     await Blog.deleteMany({})
-  
+
     const blogObjects = helper.initialBlogs.map(blog => new Blog(blog))
     const promiseArray = blogObjects.map(blog => blog.save())
     await Promise.all(promiseArray)
