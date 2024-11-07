@@ -17,7 +17,7 @@ describe('when blog posts already exist', () => {
     await Promise.all(promiseArray)
   })
 
-  test('blogs are returned as json', async () => {
+  test('blogs are returned as JSON', async () => {
     await api
       .get('/api/blogs')
       .expect(200)
