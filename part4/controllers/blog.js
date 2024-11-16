@@ -1,6 +1,5 @@
 const blogRouter = require('express').Router()
 const Blog = require('../models/blog')
-const User = require('../models/user')
 const jwt = require('jsonwebtoken')
 
 blogRouter.get('/', async (_, res) => {
@@ -30,6 +29,17 @@ blogRouter.post('/', async (req, res) => {
 
 blogRouter.put('/:id', async (req, res) => {
   const { title, author, url, likes } = req.body
+  const user = req.user
+
+  if (!user) {
+    return res.status(401).json({ error: 'invalid token' })
+  }
+
+  const blog = await Blog.findById(req.params.id)
+
+  if (req.user !== blog.user.toString()) {
+    return res.status(401).json({ error: 'you do not have permission to update this' })
+  }
 
   const updatedBlog = await Blog.findByIdAndUpdate(
     req.params.id,
@@ -41,10 +51,9 @@ blogRouter.put('/:id', async (req, res) => {
 })
 
 blogRouter.delete('/:id', async (req, res) => {
-  const token = jwt.verify(req.token, process.env.SECRET)
   const blog = await Blog.findById(req.params.id)
 
-  if (token.id.toString() !== blog.user.toString()) {
+  if (req.user !== blog.user.toString()) {
     return res.status(401).json({ error: 'you do not have permission to delete this' })
   }
 

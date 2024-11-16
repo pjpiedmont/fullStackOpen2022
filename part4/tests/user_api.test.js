@@ -5,6 +5,7 @@ const mongoose = require('mongoose')
 const User = require('../models/user')
 const helper = require('./user_helper')
 const app = require('../app')
+const bcrypt = require('bcrypt')
 
 const api = supertest(app)
 
@@ -12,7 +13,16 @@ describe('when at least one user is in the DB', () => {
   beforeEach(async () => {
     await User.deleteMany({})
 
-    const userObjects = helper.initialUsers.map(user => new User(user))
+    const userObjects = await Promise.all(helper.initialUsers.map(async user => {
+      const userCopy = {
+        username: user.username,
+        name: user.name,
+        passwordHash: await bcrypt.hash(user.password, 10)
+      }
+
+      return new User(userCopy)
+    }))
+
     const promiseArray = userObjects.map(user => user.save())
     await Promise.all(promiseArray)
   })
